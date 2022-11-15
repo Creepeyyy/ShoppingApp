@@ -1,0 +1,42 @@
+{% extends 'home.html' %}
+
+{% block title %}Users list{% endblock %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+    {% if user.is_authorized %}
+        <h3>Users list</h3>
+        <div class="row">
+            {% for myuser in all_users %}
+                <div class="col s4">
+                    {% if myuser.role == "SU" %}
+                        <div class="card red darken-1 white-text">
+                            <div class="card-content">
+                                <span class="card-title">{{ myuser }}</span>
+                                <b>Role:</b> Admin<br>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="card white">
+                            <div class="card-image">
+                                {% if myuser.profile_picture %}
+                                    <img src="{{ myuser.profile_picture.url }}" style="height: 90%; height: auto">
+                                {% endif %}
+                            </div>
+                            <div class="card-content">
+                                <span class="card-title">{{ myuser }}</span>
+                                <b>First name:</b> {{ myuser.first_name }}<br>
+                                <b>Last name:</b> {{ myuser.last_name }}<br>
+                                <b>Role:</b> {{myuser.get_role_display}}<br>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p>Please go along, there is nothing to see here.<p>
+        {% endif %}
+    </div>
+{% endblock %}

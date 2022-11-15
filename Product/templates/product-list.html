@@ -1,0 +1,154 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Amyzone - Products list{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h3>Products list</h3>
+        {% if user.is_authorized %}
+            <a class="waves-effect btn red darken-1" href={% url 'product-create' %}><i class="material-icons left">add</i>Add a new product</a><br><br>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <div class="col s3">
+            <div class="card white" style="position: fixed; width: 23vw; overflow: auto;">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="card-content">
+                        <span class="card-title red-text text-darken-1">Product Search</span>
+                        <div class="row">
+                            <div class="input-field col s6 grey-text">
+                                <label for="id_name">Name</label>
+                                <input type="text" name="name" maxlength="100" required id="id_name">
+                            </div>
+                            <div class="input-field col s6 grey-text">
+                                <label for="id_description">Description</label>
+                                <textarea name="description" class="materialize-textarea" cols="40" rows="10" id="id_description"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <select name="sortPriceBy" id="id_sortPriceBy">
+                                    <option value="MAX" selected>Less than</option>
+                                    <option value="MIN">More than</option>
+                                </select>
+                                <label for="id_sortPriceBy">Filter by price</label>
+                            </div>
+                            <div class="input-field col s6 grey-text">
+                                <label for="id_price">Price in €</label>
+                                <input type="number" name="price" id="id_price" min="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <select name="sortStarsBy" id="id_sortStarsBy">
+                                    <option value="MIN" selected>More than</option>
+                                    <option value="MAX">Less than</option>
+                                </select>
+                                <label for="id_sortStarsBy">Filter by rating</label>
+                            </div>
+                            <div class="col s6">
+                                <span class="chip red darken-1 white-text" id="chip_stars">Stars</span>
+                                <span id="rateyo_stars" class="rateYo" data-rateyo-rating="0" data-rateyo-num-stars="5" data-rateyo-score="4" data-rateyo-multi-color="true" data-rateyo-full-star="true"></span>
+                                <input type="number" name="stars" required id="{{ form.stars.id_for_label }}" value="0" min="0" max="5" hidden>
+                            </div>
+                        </div>
+                        <button class="waves-effect btn red darken-1 white-text" type="submit"><i class="material-icons left">search</i>Search</button>
+                        {% if search %}
+                            <a class="waves-effect btn white red-text text-darken-1" href={% url 'product-list' %}><i class="material-icons left">clear</i>Clear filters</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col s9">
+            {% if search %}
+                <h5>Search results</h5>
+                {% for product in products_found %}
+                    {% comment %} other attributes maybe picture of product {% endcomment %}
+                    <div class="col s4">
+                        <div class="card sticky-action white">
+                            <div class="card-image waves-effect waves-block waves-light">
+                                {% with p_image=product.first_image %}
+                                    {% if p_image %}
+                                        <a href="{{ product.id }}/"><img src="{{ p_image.image.url }}" alt="Amyzone Logo" style="width: 100%; height: auto;"></a>
+                                    {% else %}
+                                        <a href="{{ product.id }}/"><img src="{% static '/images/amyzoneface.png' %}" alt="Amyzone Logo" style="width: 100%; height: auto;"></a>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                            <div class="card-content" style="height: 12rem; overflow-y: auto;">
+                                <span class="card-title activator black-text">{{ product.name }}</span>
+                                <div style="text-align: left;">
+                                    {% if product.average_rating.stars__avg != null %}
+                                        <span class="rateYo" id="product_rating_stars_id" data-rateyo-rating="{{ product.average_rating.stars__avg }}" data-rateyo-num-stars="5" data-rateyo-multi-color="true" data-rateyo-full-star="true" data-rateyo-read-only="true"></span>
+                                    {% else %}
+                                        <span class="rateYo" id="product_rating_stars_id" data-rateyo-rating="0" data-rateyo-num-stars="5" data-rateyo-multi-color="true" data-rateyo-full-star="true" data-rateyo-read-only="true"></span>
+                                    {% endif %}
+                                </div>
+                                <div style="text-align: right;">
+                                    <span class="chip red darken-1 white-text z-depth-1">
+                                        {{ product.price }} €
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-reveal">
+                                <span class="card-title grey-text text-darken-4">Product description:<i class="material-icons right">close</i></span>
+                                <p>{{ product.description }}</p>
+                                <div style="text-align: right;">
+                                    <span class="chip red darken-1 white-text z-depth-1">
+                                        {{ product.price }} €
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                {% for product in all_products %}
+                    {% comment %} other attributes maybe picture of product {% endcomment %}
+                    <div class="col s4">
+                        <div class="card sticky-action white">
+                            <div class="card-image waves-effect waves-block waves-light">
+                                {% with p_image=product.first_image %}
+                                    {% if p_image %}
+                                        <a href="{{ product.id }}/"><img src="{{ p_image.image.url }}" alt="Amyzone Logo" style="width: 100%; height: 30rem;"></a>
+                                    {% else %}
+                                        <a href="{{ product.id }}/"><img src="{% static '/images/amyzoneface.png' %}" alt="Amyzone Logo" style="width: 100%; height: 30rem;"></a>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                            <div class="card-content" style="height: 12rem; overflow-y: auto;">
+                                <span class="card-title activator black-text">{{ product.name }}</span>
+                                <div style="text-align: left;">
+                                    {% if product.average_rating.stars__avg != null %}
+                                        <span class="rateYo" id="product_rating_stars_id" data-rateyo-rating="{{ product.average_rating.stars__avg }}" data-rateyo-num-stars="5" data-rateyo-multi-color="true" data-rateyo-full-star="true" data-rateyo-read-only="true"></span>
+                                    {% else %}
+                                        <span class="rateYo" id="product_rating_stars_id" data-rateyo-rating="0" data-rateyo-num-stars="5" data-rateyo-multi-color="true" data-rateyo-full-star="true" data-rateyo-read-only="true"></span>
+                                    {% endif %}
+                                </div>
+                                <div style="text-align: right;">
+                                    <span class="chip red darken-1 white-text z-depth-1">
+                                        {{ product.price }} €
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-reveal">
+                                <span class="card-title grey-text text-darken-4">Product description:<i class="material-icons right">close</i></span>
+                                <p>{{ product.description }}</p>
+                                <div style="text-align: right;">
+                                    <span class="chip red darken-1 white-text z-depth-1">
+                                        {{ product.price }} €
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Amyzone{% endblock %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/theming.css' %}">
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript" src="{% static 'js/loadingMaterialize.js' %}"></script>
+{% endblock %}
+
+{% block shopping_cart %}
+    {% if user.is_authenticated %}
+        {{ request.user.count_shopping_cart_items }} items
+    {% else %}
+        no items
+    {% endif %}
+{% endblock %}
+
+{% block sidenav %}
+    <ul id="userSidenav" class="sidenav z-depth-3">
+        <li><div class="user-view">
+            <div class="background red darken-1"></div>
+            <a class="brand-logo"><img src="{% static '/images/amyzonelogo.png' %}" alt="Amyzone Logo" height="60"></a>
+            {% if user.is_authenticated %}
+                {% if user.profile_picture %}
+                    <img class="circle" src="{{ user.profile_picture.url }}">
+                {% else %}
+                    <img class="circle" src="{% static '/images/amyzoneface.png' %}">
+                {% endif %}
+                <span class="white-text name"><h5>{{ user.username }}</h5></span>
+                <span class="white-text email"><h6>{{ user.email }}</h6></span>
+            {% else %}
+                <span class="white-text"><h5></h5></span>
+            {% endif %}
+        </div></li>
+        {% if user.is_authenticated %}
+            <li><a class="waves-effect red-text text-darken-1" href="{% url 'logout' %}"><i class="material-icons red-text text-darken-1">logout</i>Logout</a></li>
+            <li><div class="divider"></div></li>
+            {% if user.is_authorized %}
+                <li><a class="subheader">Admin Functions</a></li>
+                <li><a class="waves-effect" href="{% url 'myuser-list' %}"><i class="material-icons red-text text-darken-1">group</i>Users</a></li>
+                <li><div class="divider"></div></li>
+            {% endif %}
+            <li><a class="subheader">User Functions</a></li>
+            <li><a class="waves-effect" href="{% url 'product-list' %}"><i class="material-icons red-text text-darken-1">shopping_bag</i>Products</a></li>
+        {% else %}
+            <li><a class="waves-effect" href="{% url 'signup' %}"><i class="material-icons lime-text">person_add</i>Sign up</a></li>
+            <li><a class="waves-effect" href="{% url 'login' %}"><i class="material-icons red-text text-darken-1">login</i>Login</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <div class="container">
+            <div class="row">
+                <div class="col s6 m3">
+                    <img src="{% static '/images/amyzoneface.png' %}" alt="Amyzone Logo" width="350">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 m6">
+                    <div class="card red darken-1 z-depth-3">
+                        <div class="card-content white-text">
+                            <p>Willkommen zurück, {{ user.username }}.</p>
+                            <br><p>Stöbere ganz entspannt durch unsere Produkte und gönn dir mal etwas ganz besonderes.</p>
+                        </div>
+                        <div class="card-action">
+                          <a class="waves-effect white-text" href="{% url 'product-list' %}"><i class="material-icons white-text">shopping_bag</i>zu den Produkten</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        {% block not_logged_in_content %}
+            <div class="container">
+                <div class="row">
+                    <div class="col s6 m3">
+                        <img src="{% static '/images/amyzoneface.png' %}" alt="Amyzone Logo" width="350">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12 m6">
+                        <div class="card red darken-1 z-depth-3">
+                            <div class="card-content white-text">
+                                <p>Willkommen bei Amyzone. Hier findest du die neuesten und angesagtesten Produkte, die du dir nur so ausdenken kannst. Natürlich immer zu den besten Preisen, versteht sich. Wir liefern nur allerbeste Qualität von handerlesenen, höchst vertrauensvollen Händlern. Dafür stehen wir mit unserem Namen.</p>
+                                <br><p>Wenn du noch nicht Teil unserer Familie bist, dann regestriere dich jetzt.</p>
+                                <br><a href="{% url 'signup' %}" class="waves-effect waves-light btn lime black-text"><i class="material-icons left">person_add</i>Signup</a>
+                                <a href="{% url 'login' %}" class="waves-effect waves-light btn white black-text"><i class="material-icons left">login</i>Login</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s6 m3">
+                        <img src="{% static '/images/amyzonelogo.png' %}" alt="Amyzone Logo" width="350">
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
+    {% endif %}
+{% endblock %}
